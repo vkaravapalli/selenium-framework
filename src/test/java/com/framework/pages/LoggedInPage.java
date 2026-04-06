@@ -14,7 +14,7 @@ public class LoggedInPage extends BasePage {
     @FindBy(css = "a.wp-block-button__link")
     private WebElement logOutButton;
 
-    @FindBy(css = "article .entry-content p:first-of-type")
+    @FindBy(css = "h1.post-title")
     private WebElement successMessage;
 
     /**

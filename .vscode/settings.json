@@ -1,0 +1,11 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.test.config": {
+    "name": "Selenium TestNG",
+    "workingDirectory": "${workspaceFolder}"
+  },
+  "java.compile.nullAnalysis.mode": "automatic",
+  "editor.formatOnSave": true,
+  "maven.executable.path": "",
+  "java.jdt.ls.java.home": ""
+}

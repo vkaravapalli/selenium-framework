@@ -3,6 +3,10 @@
 
 <suite name="Selenium Automation Suite" parallel="methods" thread-count="3" verbose="1">
 
+    <listeners>
+        <listener class-name="com.framework.listeners.TestListener"/>
+    </listeners>
+
     <test name="Login Tests">
         <classes>
             <class name="com.framework.tests.LoginTest">

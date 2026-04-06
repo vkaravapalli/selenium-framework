@@ -1,12 +1,12 @@
 package com.framework.base;
 
+import com.aventstack.extentreports.MediaEntityBuilder;
 import com.framework.config.ConfigReader;
 import com.framework.driver.DriverManager;
 import com.framework.utils.ExtentReportManager;
+import com.framework.utils.ScreenshotUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -15,12 +15,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Base test class. All test classes must extend this.
@@ -32,30 +26,26 @@ public class BaseTest {
 
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite() {
-        // Ensure reports directory exists
-        new File("reports").mkdirs();
         new File("reports/screenshots").mkdirs();
         log.info("Test suite started.");
     }
 
     /**
-     * Initializes the WebDriver and ExtentTest before each test method.
+     * Initializes WebDriver and ExtentTest before each test method.
      *
      * @param result ITestResult injected by TestNG
      */
     @BeforeMethod(alwaysRun = true)
     public void setUp(ITestResult result) {
         String testName = result.getMethod().getMethodName();
+        String description = result.getMethod().getDescription();
         log.info("Starting test: {}", testName);
 
         DriverManager.initDriver();
+        DriverManager.getDriver().get(ConfigReader.get("base.url"));
 
-        String baseUrl = ConfigReader.get("base.url");
-        DriverManager.getDriver().get(baseUrl);
-
-        ExtentReportManager.createTest(testName,
-                result.getMethod().getDescription());
-        ExtentReportManager.logInfo("Browser launched. Navigated to: " + baseUrl);
+        ExtentReportManager.createTest(testName, description != null ? description : "");
+        ExtentReportManager.logInfo("Browser launched → " + ConfigReader.get("base.url"));
     }
 
     /**
@@ -68,8 +58,7 @@ public class BaseTest {
     }
 
     /**
-     * Tears down the driver after each test.
-     * Captures screenshot on failure and logs to ExtentReports.
+     * Tears down driver after each test. Captures screenshot on failure.
      *
      * @param result ITestResult injected by TestNG
      */
@@ -78,14 +67,21 @@ public class BaseTest {
         String testName = result.getMethod().getMethodName();
 
         if (result.getStatus() == ITestResult.FAILURE) {
-            String screenshotPath = captureScreenshot(testName);
-            ExtentReportManager.logFail("Test FAILED: " + result.getThrowable().getMessage());
-            ExtentReportManager.getTest()
-                    .addScreenCaptureFromPath(screenshotPath, "Failure Screenshot");
+            try {
+                String base64 = ScreenshotUtils.captureBase64(getDriver());
+                ExtentReportManager.logFail("Test FAILED: " + result.getThrowable().getMessage());
+                ExtentReportManager.getTest()
+                        .fail("Screenshot on failure",
+                                MediaEntityBuilder.createScreenCaptureFromBase64String(base64).build());
+            } catch (Exception e) {
+                log.warn("Could not attach screenshot: {}", e.getMessage());
+            }
             log.error("Test FAILED: {}", testName, result.getThrowable());
+
         } else if (result.getStatus() == ITestResult.SUCCESS) {
-            ExtentReportManager.logPass("Test PASSED");
+            ExtentReportManager.logPass("Test PASSED ✅");
             log.info("Test PASSED: {}", testName);
+
         } else {
             ExtentReportManager.logInfo("Test SKIPPED");
             log.warn("Test SKIPPED: {}", testName);
@@ -97,32 +93,6 @@ public class BaseTest {
     @AfterSuite(alwaysRun = true)
     public void afterSuite() {
         ExtentReportManager.flushReports();
-        log.info("Test suite finished. Report generated at: reports/ExtentReport.html");
-    }
-
-    /**
-     * Captures a screenshot and saves it to reports/screenshots/.
-     *
-     * @param testName test name used in filename
-     * @return absolute path to the screenshot file
-     */
-    private String captureScreenshot(String testName) {
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String fileName = testName + "_" + timestamp + ".png";
-        String screenshotDir = "reports/screenshots/";
-        String fullPath = screenshotDir + fileName;
-
-        try {
-            byte[] screenshot = ((TakesScreenshot) getDriver())
-                    .getScreenshotAs(OutputType.BYTES);
-            Path path = Paths.get(fullPath);
-            Files.createDirectories(path.getParent());
-            Files.write(path, screenshot);
-            log.info("Screenshot saved: {}", fullPath);
-        } catch (IOException e) {
-            log.error("Failed to save screenshot", e);
-        }
-
-        return fullPath;
+        log.info("Report → reports/ExtentReport.html");
     }
 }

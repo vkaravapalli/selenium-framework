@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run All Tests (Chrome)",
+      "request": "launch",
+      "mainClass": "org.testng.TestNG",
+      "args": "src/test/resources/testng.xml",
+      "classPaths": ["${command:java.project.getClasspaths}"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Run All Tests (Firefox)",
+      "request": "launch",
+      "mainClass": "org.testng.TestNG",
+      "args": "src/test/resources/testng.xml",
+      "vmArgs": "-Dbrowser=firefox",
+      "classPaths": ["${command:java.project.getClasspaths}"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Run All Tests (Edge)",
+      "request": "launch",
+      "mainClass": "org.testng.TestNG",
+      "args": "src/test/resources/testng.xml",
+      "vmArgs": "-Dbrowser=edge",
+      "classPaths": ["${command:java.project.getClasspaths}"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

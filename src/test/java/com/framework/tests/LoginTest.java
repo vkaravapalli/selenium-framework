@@ -69,7 +69,8 @@ public class LoginTest extends BaseTest {
         // Verify success message
         String successText = loggedInPage.getSuccessMessage();
         boolean hasSuccessText = successText.contains("Congratulations")
-                || successText.toLowerCase().contains("successfully logged in");
+                || successText.toLowerCase().contains("successfully logged in")
+                || successText.toLowerCase().contains("logged in successfully");
         Assert.assertTrue(hasSuccessText,
                 "Success message should contain 'Congratulations' or 'successfully logged in'. Got: " + successText);
         ExtentReportManager.logPass("Success message verified: " + successText);
