@@ -1,6 +1,7 @@
 package com.framework.tests;
 
 import com.framework.base.BaseTest;
+import com.framework.pages.LoggedInPage;
 import com.framework.pages.LoginPage;
 import com.framework.utils.ExtentReportManager;
 import org.testng.Assert;
@@ -8,96 +9,105 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for Login functionality on https://www.saucedemo.com.
+ * Test class for https://practicetestautomation.com/practice-test-login/
+ *
+ * Test Cases:
+ *   TC1 - Positive login: valid credentials → success page
+ *   TC2 - Negative: invalid username → error message
+ *   TC3 - Negative: invalid password → error message
  */
 public class LoginTest extends BaseTest {
 
     // ---- Data Providers ----
 
-    /**
-     * Valid credentials for saucedemo.
-     */
     @DataProvider(name = "validCredentials")
     public Object[][] validCredentials() {
         return new Object[][] {
-            { "standard_user", "secret_sauce" }
+            { "student", "Password123" }
         };
     }
 
-    /**
-     * Invalid credential combinations.
-     */
     @DataProvider(name = "invalidCredentials")
     public Object[][] invalidCredentials() {
         return new Object[][] {
-            { "invalid_user",   "wrong_password",  "Epic sadface: Username and password do not match any user in this service" },
-            { "locked_out_user","secret_sauce",    "Epic sadface: Sorry, this user has been locked out." }
+            { "incorrectUser",  "Password123",      "Your username is invalid!" },
+            { "student",        "incorrectPassword", "Your password is invalid!" }
         };
     }
 
     // ---- Test Methods ----
 
     /**
-     * Verifies that a valid user can log in successfully.
+     * TC1 - Positive LogIn test.
+     * Steps:
+     * 1. Open login page
+     * 2. Enter username: student
+     * 3. Enter password: Password123
+     * 4. Click Submit
+     * 5. Verify URL contains "logged-in-successfully"
+     * 6. Verify success message contains "Congratulations" or "successfully logged in"
+     * 7. Verify Log out button is displayed
      */
     @Test(dataProvider = "validCredentials",
-          description = "Verify successful login with valid credentials",
+          description = "TC1 - Positive login with valid credentials",
           groups = {"smoke", "regression"})
     public void testValidLogin(String username, String password) {
-        ExtentReportManager.logInfo("Attempting login with user: " + username);
+        ExtentReportManager.logInfo("TC1: Opening login page");
 
         LoginPage loginPage = new LoginPage(getDriver());
         loginPage.login(username, password);
 
-        ExtentReportManager.logInfo("Login submitted. Checking result...");
-        Assert.assertTrue(loginPage.isLoginSuccessful(),
-                "Login should succeed for user: " + username);
+        ExtentReportManager.logInfo("Credentials entered and Submit clicked");
 
-        ExtentReportManager.logPass("Valid login succeeded for: " + username);
+        LoggedInPage loggedInPage = new LoggedInPage(getDriver());
+
+        // Verify URL
+        Assert.assertTrue(loggedInPage.isOnSuccessPage(),
+                "URL should contain 'logged-in-successfully'. Actual: " + loggedInPage.getCurrentUrl());
+        ExtentReportManager.logPass("URL verified: contains 'logged-in-successfully'");
+
+        // Verify success message
+        String successText = loggedInPage.getSuccessMessage();
+        boolean hasSuccessText = successText.contains("Congratulations")
+                || successText.toLowerCase().contains("successfully logged in");
+        Assert.assertTrue(hasSuccessText,
+                "Success message should contain 'Congratulations' or 'successfully logged in'. Got: " + successText);
+        ExtentReportManager.logPass("Success message verified: " + successText);
+
+        // Verify Log out button
+        Assert.assertTrue(loggedInPage.isLogOutButtonDisplayed(),
+                "Log out button should be visible after login");
+        ExtentReportManager.logPass("Log out button is displayed");
     }
 
     /**
-     * Verifies that invalid credentials show the correct error message.
+     * TC2 - Negative username test.
+     * Steps:
+     * 1. Open login page
+     * 2. Enter username: incorrectUser
+     * 3. Enter password: Password123
+     * 4. Click Submit
+     * 5. Verify error message is displayed
+     * 6. Verify error text is "Your username is invalid!"
      */
     @Test(dataProvider = "invalidCredentials",
-          description = "Verify error message displayed for invalid credentials",
+          description = "TC2/TC3 - Negative login with invalid credentials",
           groups = {"regression"})
     public void testInvalidLogin(String username, String password, String expectedError) {
-        ExtentReportManager.logInfo("Attempting login with invalid user: " + username);
+        ExtentReportManager.logInfo("Attempting login with username: " + username);
 
         LoginPage loginPage = new LoginPage(getDriver());
         loginPage.login(username, password);
 
-        ExtentReportManager.logInfo("Checking for error message...");
+        ExtentReportManager.logInfo("Checking error message...");
+
         Assert.assertTrue(loginPage.isErrorDisplayed(),
-                "Error message should be displayed for invalid login");
+                "Error message should be displayed for invalid credentials");
+        ExtentReportManager.logPass("Error message is displayed");
 
         String actualError = loginPage.getErrorMessage();
-        Assert.assertTrue(actualError.contains(expectedError.substring(0, 30)),
-                "Error message mismatch. Expected to contain: " + expectedError
-                + " | Got: " + actualError);
-
-        ExtentReportManager.logPass("Correct error shown for invalid credentials: " + username);
-    }
-
-    /**
-     * Verifies that submitting empty credentials shows an error.
-     */
-    @Test(description = "Verify error message when credentials are empty",
-          groups = {"regression"})
-    public void testEmptyCredentials() {
-        ExtentReportManager.logInfo("Submitting login form with empty fields");
-
-        LoginPage loginPage = new LoginPage(getDriver());
-        loginPage.clickLogin();
-
-        Assert.assertTrue(loginPage.isErrorDisplayed(),
-                "Error message should appear for empty credentials");
-
-        String error = loginPage.getErrorMessage();
-        Assert.assertTrue(error.contains("Username is required"),
-                "Expected 'Username is required' error. Got: " + error);
-
-        ExtentReportManager.logPass("Empty credentials correctly rejected with error: " + error);
+        Assert.assertEquals(actualError, expectedError,
+                "Error message mismatch. Expected: [" + expectedError + "] Got: [" + actualError + "]");
+        ExtentReportManager.logPass("Error message verified: " + actualError);
     }
 }

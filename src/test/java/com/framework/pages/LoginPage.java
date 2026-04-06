@@ -6,27 +6,21 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Page Object for the SauceDemo Login page.
- * URL: https://www.saucedemo.com
+ * Page Object for https://practicetestautomation.com/practice-test-login/
  */
 public class LoginPage extends BasePage {
 
-    // --- Locators via @FindBy (PageFactory) ---
-
-    @FindBy(id = "user-name")
+    @FindBy(id = "username")
     private WebElement usernameField;
 
     @FindBy(id = "password")
     private WebElement passwordField;
 
-    @FindBy(id = "login-button")
-    private WebElement loginButton;
+    @FindBy(id = "submit")
+    private WebElement submitButton;
 
-    @FindBy(css = "[data-test='error']")
+    @FindBy(id = "error")
     private WebElement errorMessage;
-
-    @FindBy(className = "inventory_list")
-    private WebElement inventoryList;
 
     /**
      * Initializes LoginPage with the given driver.
@@ -38,7 +32,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Types into the username field.
+     * Types into the Username field.
      *
      * @param username username string
      */
@@ -47,7 +41,7 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Types into the password field.
+     * Types into the Password field.
      *
      * @param password password string
      */
@@ -56,10 +50,10 @@ public class LoginPage extends BasePage {
     }
 
     /**
-     * Clicks the Login button.
+     * Clicks the Submit button.
      */
-    public void clickLogin() {
-        click(loginButton);
+    public void clickSubmit() {
+        click(submitButton);
     }
 
     /**
@@ -71,42 +65,24 @@ public class LoginPage extends BasePage {
     public void login(String username, String password) {
         enterUsername(username);
         enterPassword(password);
-        clickLogin();
+        clickSubmit();
     }
 
     /**
-     * Returns the text of the error message element.
+     * Returns the error message text.
      *
-     * @return error message text
+     * @return error message string
      */
     public String getErrorMessage() {
         return getText(errorMessage);
     }
 
     /**
-     * Returns true if the error message is displayed.
+     * Returns true if the error message is visible.
      *
-     * @return true if error is shown
+     * @return true if error is displayed
      */
     public boolean isErrorDisplayed() {
         return isDisplayed(errorMessage);
-    }
-
-    /**
-     * Returns true if the login was successful (inventory list visible).
-     *
-     * @return true if logged in
-     */
-    public boolean isLoginSuccessful() {
-        return isDisplayed(inventoryList);
-    }
-
-    /**
-     * Returns true if we are on the login page.
-     *
-     * @return true if login button is visible
-     */
-    public boolean isOnLoginPage() {
-        return isDisplayed(loginButton);
     }
 }
