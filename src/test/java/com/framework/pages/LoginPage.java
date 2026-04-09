@@ -19,7 +19,7 @@ public class LoginPage extends BasePage {
     @FindBy(id = "submit")
     private WebElement submitButton;
 
-    @FindBy(css = "[data-test='error']")
+    @FindBy(id = "error")
     private WebElement errorMessage;
 
     /**
