@@ -13,7 +13,13 @@
                 <methods>
                     <include name="testValidLogin"/>
                     <include name="testInvalidLogin"/>
-                    <include name="testEmptyCredentials"/>
+                    <include name="testEmptyUsernameOnly"/>
+                    <include name="testEmptyPasswordOnly"/>
+                    <include name="testBothFieldsEmpty"/>
+                    <include name="testUsernameCaseSensitivity"/>
+                    <include name="testLogout"/>
+                    <include name="testLoginPageTitle"/>
+                    <include name="testLoginPageUIElements"/>
                 </methods>
             </class>
         </classes>

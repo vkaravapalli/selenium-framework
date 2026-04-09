@@ -19,7 +19,7 @@ public class LoginPage extends BasePage {
     @FindBy(id = "submit")
     private WebElement submitButton;
 
-    @FindBy(id = "error")
+    @FindBy(css = "[data-test='error']")
     private WebElement errorMessage;
 
     /**
@@ -84,5 +84,41 @@ public class LoginPage extends BasePage {
      */
     public boolean isErrorDisplayed() {
         return isDisplayed(errorMessage);
+    }
+
+    /**
+     * Returns true if the username field is visible.
+     *
+     * @return true if displayed
+     */
+    public boolean isUsernameFieldDisplayed() {
+        return isDisplayed(usernameField);
+    }
+
+    /**
+     * Returns true if the password field is visible.
+     *
+     * @return true if displayed
+     */
+    public boolean isPasswordFieldDisplayed() {
+        return isDisplayed(passwordField);
+    }
+
+    /**
+     * Returns true if the submit button is visible.
+     *
+     * @return true if displayed
+     */
+    public boolean isSubmitButtonDisplayed() {
+        return isDisplayed(submitButton);
+    }
+
+    /**
+     * Returns true if we are on the login page (submit button visible).
+     *
+     * @return true if on login page
+     */
+    public boolean isOnLoginPage() {
+        return isDisplayed(submitButton);
     }
 }

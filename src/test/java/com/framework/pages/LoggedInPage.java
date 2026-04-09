@@ -6,8 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Page Object for the post-login success page.
- * URL: https://practicetestautomation.com/logged-in-successfully/
+ * Page Object for https://practicetestautomation.com/logged-in-successfully/
  */
 public class LoggedInPage extends BasePage {
 
@@ -29,16 +28,16 @@ public class LoggedInPage extends BasePage {
     /**
      * Returns true if the Log out button is displayed.
      *
-     * @return true if Log out is visible
+     * @return true if visible
      */
     public boolean isLogOutButtonDisplayed() {
         return isDisplayed(logOutButton);
     }
 
     /**
-     * Returns the success message text.
+     * Returns the success heading text.
      *
-     * @return success message string
+     * @return heading text
      */
     public String getSuccessMessage() {
         return getText(successMessage);
@@ -51,5 +50,16 @@ public class LoggedInPage extends BasePage {
      */
     public boolean isOnSuccessPage() {
         return getCurrentUrl().contains("logged-in-successfully");
+    }
+
+    /**
+     * Clicks the Log out button and returns the LoginPage.
+     *
+     * @param driver WebDriver instance
+     * @return LoginPage instance after logout
+     */
+    public LoginPage clickLogOut(WebDriver driver) {
+        click(logOutButton);
+        return new LoginPage(driver);
     }
 }
